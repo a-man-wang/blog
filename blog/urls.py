@@ -1,6 +1,8 @@
 from django.urls import path
+from .views import index
 
 from . import views
+
 
 app_name = 'blog'
 
@@ -11,4 +13,6 @@ urlpatterns = [
     path('category/<int:pk>', views.CategoryView.as_view(), name='category'),
     path('tags/<int:pk>', views.TagView.as_view(), name='tag'),
     path('search/', views.search, name='search'),
+    #path('api/index/', views.IndexPostListAPIView.as_view()),
+    path("api/index/", index),
 ]

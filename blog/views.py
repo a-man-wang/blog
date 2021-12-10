@@ -9,6 +9,8 @@ from django.utils.text import slugify
 from django.views.generic import ListView, DetailView
 from markdown.extensions.toc import TocExtension
 from pure_pagination.mixins import PaginationMixin
+
+
 # Create your views here.
 
 
@@ -80,8 +82,6 @@ class PostDetailView(DetailView):
         return post
 
 
-
-
 # def archive(request, year, month):
 #     post_list = Post.objects.filter(created_time__year=year,
 #                                     created_time__month=month
@@ -133,3 +133,42 @@ def search(request):
     post_list = Post.objects.filter(Q(title__icontains=key) | Q(body__icontains=key))
     return render(request, 'blog/index.html', {'post_list': post_list})
 
+
+'''
+rest_framework
+'''
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
+from rest_framework import mixins
+
+from .serializers import PostListSerializer
+
+
+# @api_view(http_method_names=["GET"])
+# def index(request):
+#     post_list = Post.objects.all().order_by('-created_time')
+#     serializer = PostListSerializer(post_list, many=True)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndexPostListAPIView(ListAPIView):
+    serializer_class = PostListSerializer
+    queryset = Post.objects.all()
+    pagination_class = PageNumberPagination
+    permission_classes = [AllowAny]
+
+
+class PostViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    pagination_class = LimitOffsetPagination
+    serializer_class = PostListSerializer
+    queryset = Post.objects.all()
+    pagination_class = PageNumberPagination
+    permission_classes = [AllowAny]
+
+
+index = PostViewSet.as_view({'get': 'list'})

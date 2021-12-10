@@ -16,10 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from blog.feeds import AllPostsRssFeed
+from rest_framework import routers
+from blog.views import PostViewSet
+from rest_framework.routers import DefaultRouter
 
+
+router = routers.DefaultRouter()
+router = DefaultRouter()
+router.register(r'posts', PostViewSet, basename='post')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("blog.urls")),
     path(r'', include('comments.urls')),
-    path('all/rss/', AllPostsRssFeed(), name='rss')
+    path('all/rss/', AllPostsRssFeed(), name='rss'),
+    path('api/', include(router.urls)),
+    path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
